@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { TagService } from '../services/tag.service';
 import { CreateTagDto } from '../dto/tag.dto';
 
-@Controller('organizations/:organizationId/tags')
+@Controller('/organizations/:organizationId/tags')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 

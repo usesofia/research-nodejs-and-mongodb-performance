@@ -26,8 +26,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm and pm2
+RUN npm install -g pnpm pm2
 
 # Install production dependencies only
 RUN pnpm install --prod
@@ -38,5 +38,5 @@ COPY --from=builder /app/dist ./dist
 # Expose the port the app runs on
 EXPOSE 3000
 
-# Start the application
-CMD ["node", "dist/main"] 
+# Start the application with PM2 in cluster mode
+CMD ["pm2-runtime", "start", "dist/main.js", "--instances", "4"]
