@@ -23,5 +23,5 @@ echo "Tags: $(cat ./reports/test-${TEST_NUMBER}-populate-tags-count.txt)"
 docker exec -it research-nodejs-and-mongodb-performance-mongodb-1 mongosh financial_db --eval "db.financialrecords.countDocuments()" > ./reports/test-${TEST_NUMBER}-populate-financial-records-count.txt
 echo "Financial records: $(cat ./reports/test-${TEST_NUMBER}-populate-financial-records-count.txt)"
 
-# echo "Running cash-flow.js..."
-# K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=./reports/test-${TEST_NUMBER}-cash-flow.html k6 run --vus 100 --duration 60s cash-flow.js
+echo "Running cash-flow.js..."
+K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=./reports/test-${TEST_NUMBER}-cash-flow.html k6 run --vus 100 --duration 60s cash-flow.js

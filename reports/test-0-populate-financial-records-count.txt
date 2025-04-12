@@ -1,1 +1,1 @@
-]0;mongosh mongodb://127.0.0.1:27017/financial_db?directConnection=true&serverSelectionTimeoutMS=2000[33m1101200[39m
+]0;mongosh mongodb://127.0.0.1:27017/financial_db?directConnection=true&serverSelectionTimeoutMS=2000[33m1646000[39m
