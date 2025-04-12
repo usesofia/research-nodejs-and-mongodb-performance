@@ -87,46 +87,62 @@ export class FinancialRecordService {
     const twoYearsAgo = new Date();
     twoYearsAgo.setFullYear(now.getFullYear() - 2);
 
-    const records = await this.recordModel
-      .find({
-        organizationId,
-        dueDate: { $gte: twoYearsAgo },
-      })
-      .exec();
-
-    // Group records by year and month
-    const monthlyData: { [key: string]: MonthlyCashFlowDto } = {};
-
-    records.forEach((record) => {
-      const date = new Date(record.dueDate);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1; // MongoDB months are 1-12
-      const key = `${year}-${month}`;
-
-      if (!monthlyData[key]) {
-        monthlyData[key] = {
-          year,
-          month,
-          in: 0,
-          out: 0,
-        };
+    const result = await this.recordModel.aggregate([
+      // Match records for the organization and date range
+      {
+        $match: {
+          organizationId,
+          dueDate: { $gte: twoYearsAgo }
+        }
+      },
+      // Group by year and month
+      {
+        $group: {
+          _id: {
+            year: { $year: "$dueDate" },
+            month: { $month: "$dueDate" }
+          },
+          in: {
+            $sum: {
+              $cond: [
+                { $eq: ["$direction", "IN"] },
+                "$amount",
+                0
+              ]
+            }
+          },
+          out: {
+            $sum: {
+              $cond: [
+                { $eq: ["$direction", "OUT"] },
+                "$amount",
+                0
+              ]
+            }
+          }
+        }
+      },
+      // Project to match the expected output format
+      {
+        $project: {
+          _id: 0,
+          year: "$_id.year",
+          month: "$_id.month",
+          in: 1,
+          out: 1
+        }
+      },
+      // Sort by year and month
+      {
+        $sort: {
+          year: 1,
+          month: 1
+        }
       }
-
-      if (record.direction === 'IN') {
-        monthlyData[key].in += record.amount;
-      } else {
-        monthlyData[key].out += record.amount;
-      }
-    });
-
-    // Convert to array and sort
-    const result = Object.values(monthlyData).sort((a, b) => {
-      if (a.year !== b.year) return a.year - b.year;
-      return a.month - b.month;
-    });
+    ]);
 
     return {
-      monthlyData: result,
+      monthlyData: result
     };
   }
 }
