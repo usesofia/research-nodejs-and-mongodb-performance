@@ -30,3 +30,6 @@ export const FinancialRecordSchema =
 
 // Add the pagination plugin
 FinancialRecordSchema.plugin(mongoosePaginatePlugin);
+
+// Add compound index for organizationId and dueDate
+FinancialRecordSchema.index({ organizationId: 1, dueDate: 1 });
